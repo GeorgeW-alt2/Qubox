@@ -132,7 +132,7 @@ void loop() {
   Serial.print(str);
 
   // Print the array values if n >= 3
-  if (n >= 3) {
+  if (n > 3) {
     Serial.print("Original code: ");
     for (int i = 0; i < sizeof(numbers) / sizeof(numbers[0]); i++) {
       Serial.print(numbers[i]);
