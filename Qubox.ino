@@ -75,7 +75,7 @@ void loop() {
       delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 1000);//add weight '1000' for ease of differentiation. 
       break;
     case 1:
-      delayTime = map(analogRead(delayTimePin), 0, 1023, 1000, 1);//add weight '1000' for ease of differentiation. 
+      delayTime = map(analogRead(delayTimePin), 0, 1023, 1000, 1);
       break;
 
   }
@@ -130,9 +130,8 @@ void loop() {
   Serial.print(delayedValue);
   Serial.print(" Sample Rate: ");
   Serial.print(sampleRate);
-  Serial.print(" Hz, ");
-  //Serial.print(" Coordinate Time: ");
-  //Serial.print(delayTime);
+  Serial.print(" Hz, Coordinate Time: ");
+  Serial.print(delayTime);
   Serial.print(" ms");
 
   // Display proper time duration when unequal period ends
