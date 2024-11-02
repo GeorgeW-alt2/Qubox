@@ -130,9 +130,7 @@ void loop() {
   Serial.print(delayedValue);
   Serial.print(" Sample Rate: ");
   Serial.print(sampleRate);
-  Serial.print(" Hz, Coordinate Time: ");
-  Serial.print(delayTime);
-  Serial.print(" ms");
+  Serial.print(" Hz");
 
   // Display proper time duration when unequal period ends
   if (!unequalActive && properTimeDuration > 0) {
