@@ -1,1 +1,3 @@
 # Qubox
+Quantum binary code cracker game
+Square wave functions are 0... smooth wave functions are 1...
