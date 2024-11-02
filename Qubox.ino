@@ -34,7 +34,7 @@ unsigned long properTimeDuration = 0; // Measured proper time duration
 bool unequalActive = false;     // Track if unequal period is active
 
 // Define an array of 4 elements to hold random binary values
-int numbers[4];  
+int numbers[1];  
 
 void setup() {
   // Seed the random number generator with an analog reading
@@ -132,8 +132,8 @@ void loop() {
   Serial.print(str);
 
   // Print the array values if n >= 3
-  if (n > 3) {
-    Serial.print("Original code: ");
+  if (n > 0) {
+    Serial.print(" Original code: ");
     for (int i = 0; i < sizeof(numbers) / sizeof(numbers[0]); i++) {
       Serial.print(numbers[i]);
       if (i < sizeof(numbers) / sizeof(numbers[0]) - 1) {
