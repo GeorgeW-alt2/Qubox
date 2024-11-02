@@ -1,6 +1,9 @@
 //Qubox - 2024
 #include "pitches.h"
+const int MAX_ITEMS = 8;
+
 const int total_binary_numbers = 2;
+int itemCount = total_binary_numbers;      // Tracks the number of items added
 
 String str = "";
 int n = 0;
@@ -54,7 +57,14 @@ void setup() {
     numbers[i] = random(0, 2);  // Each element will be either 0 or 1
   }
 }
-
+void addItem(int item) {
+    if (itemCount < MAX_ITEMS) {
+        numbers[itemCount] = item;
+        itemCount++;
+    } else {
+        Serial.println("Array is full!");
+    }
+}
 void loop() {
   // Read values from potentiometers
   Serial.print("Code input: ");
@@ -62,10 +72,10 @@ void loop() {
   int range = numbers[n];
   switch (range) { //qubit 
     case 0:
-      delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 300); 
+      delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 1000);//add weight '1000' for ease of differentiation. 
       break;
     case 1:
-      delayTime = map(analogRead(delayTimePin), 0, 1023, 300, 1);
+      delayTime = map(analogRead(delayTimePin), 0, 1023, 100, 1);
       break;
 
   }
