@@ -56,7 +56,7 @@ void setup() {
 
 void loop() {
   // Read values from potentiometers
-  Serial.print("Code input:");
+  Serial.print("Code input: ");
 
   int range = numbers[n];
   switch (range) {
@@ -119,7 +119,7 @@ void loop() {
   Serial.print(delayedValue);
   Serial.print(" Sample Rate: ");
   Serial.print(sampleRate);
-  Serial.print(" Hz, Delay Time: ");
+  Serial.print(" Hz, Coordinate Time: ");
   Serial.print(delayTime);
   Serial.print(" ms");
 
