@@ -75,7 +75,7 @@ void loop() {
       delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 1000);//add weight '1000' for ease of differentiation. 
       break;
     case 1:
-      delayTime = map(analogRead(delayTimePin), 0, 1023, 100, 1);
+      delayTime = map(analogRead(delayTimePin), 0, 1023, 1000, 1);//add weight '1000' for ease of differentiation. 
       break;
 
   }
