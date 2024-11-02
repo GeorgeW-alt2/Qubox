@@ -132,7 +132,7 @@ void loop() {
   Serial.print(sampleRate);
   Serial.print(" Hz, ");
   //Serial.print(" Coordinate Time: ");
-  Serial.print(delayTime);
+  //Serial.print(delayTime);
   Serial.print(" ms");
 
   // Display proper time duration when unequal period ends
