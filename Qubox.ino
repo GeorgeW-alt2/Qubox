@@ -1,5 +1,6 @@
 //Qubox - 2024
 #include "pitches.h"
+const int total_binary_numbers = 2;
 
 String str = "";
 int n = 0;
@@ -34,7 +35,6 @@ unsigned long properTimeDuration = 0; // Measured proper time duration
 bool unequalActive = false;     // Track if unequal period is active
 
 // Define an array of 4 elements to hold random binary values
-int total_binary_numbers
 int numbers[total_binary_numbers];  
 
 void setup() {
@@ -60,7 +60,7 @@ void loop() {
   Serial.print("Code input: ");
 
   int range = numbers[n];
-  switch (range) { //qubits 
+  switch (range) { //qubit 
     case 0:
       delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 300); 
       break;
@@ -68,14 +68,7 @@ void loop() {
       delayTime = map(analogRead(delayTimePin), 0, 1023, 300, 1);
       break;
 
-    case 2:
-      delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 300); 
-      break;
-    case 3:
-      delayTime = map(analogRead(delayTimePin), 0, 1023, 300, 1);
-      break;
   }
-
   input += Serial.readStringUntil('\n');  // Read input until newline
   n = input.length();
   Serial.print(input);
