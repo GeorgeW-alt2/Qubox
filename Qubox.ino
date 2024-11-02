@@ -130,7 +130,8 @@ void loop() {
   Serial.print(delayedValue);
   Serial.print(" Sample Rate: ");
   Serial.print(sampleRate);
-  Serial.print(" Hz, Coordinate Time: ");
+  Serial.print(" Hz, ");
+  //Serial.print(" Coordinate Time: ");
   Serial.print(delayTime);
   Serial.print(" ms");
 
