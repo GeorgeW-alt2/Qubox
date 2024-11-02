@@ -34,7 +34,8 @@ unsigned long properTimeDuration = 0; // Measured proper time duration
 bool unequalActive = false;     // Track if unequal period is active
 
 // Define an array of 4 elements to hold random binary values
-int numbers[1];  
+int total_binary_numbers
+int numbers[total_binary_numbers];  
 
 void setup() {
   // Seed the random number generator with an analog reading
@@ -49,7 +50,7 @@ void setup() {
   digitalWrite(powerPin, HIGH);
 
   // Generate random binary values for the numbers array
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < total_binary_numbers ; i++) {
     numbers[i] = random(0, 2);  // Each element will be either 0 or 1
   }
 }
@@ -59,11 +60,18 @@ void loop() {
   Serial.print("Code input: ");
 
   int range = numbers[n];
-  switch (range) {
+  switch (range) { //qubits 
     case 0:
       delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 300); 
       break;
     case 1:
+      delayTime = map(analogRead(delayTimePin), 0, 1023, 300, 1);
+      break;
+
+    case 2:
+      delayTime = map(analogRead(delayTimePin), 0, 1023, 1, 300); 
+      break;
+    case 3:
       delayTime = map(analogRead(delayTimePin), 0, 1023, 300, 1);
       break;
   }
@@ -132,7 +140,7 @@ void loop() {
   Serial.print(str);
 
   // Print the array values if n >= 3
-  if (n > 0) {
+  if (n == total_binary_numbers ) {
     Serial.print(" Original code: ");
     for (int i = 0; i < sizeof(numbers) / sizeof(numbers[0]); i++) {
       Serial.print(numbers[i]);
