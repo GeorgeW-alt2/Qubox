@@ -18,9 +18,9 @@ const int checkPin = 10;
 const int delayTimePin = A4;    // Potentiometer for delay time
 const int LDR = A0;
 const int delayedOutputPin = A3;
-const int buzzerPin = 9;        // Digital output pin for inverter
+const int buzzerPin = 9;        // Digital output pin for buzzer
 
-const int powerPin = 12;        // Digital output pin for inverter
+const int powerPin = 12;        // Digital output pin for laser diode
 
 float delayLine[200];           // Maximum delay line size
 int writeIndex = 0;             // Write index for delay line
