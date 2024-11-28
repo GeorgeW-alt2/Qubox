@@ -1,5 +1,5 @@
 //Random number generator
-//Use a series of glass diodes.
+//Use multiple glass diodes in parallel.
 int sensorPin = A0;   // select the input pin for the glass diodes
 int sensorValue = 0;  // variable to store the value coming from the sensor
 int n = 0;
