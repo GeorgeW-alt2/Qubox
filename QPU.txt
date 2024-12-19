@@ -45,7 +45,6 @@ To study the behavior of a quantum system subjected to measurements that modify 
    - Once the system has explored all possible states, a final measurement will collapse the wave function into a single state that represents the solution to the optimization problem.
 
 6. **Ambient Probability Influences:**
-   - Introduce random fluctuations or noise into the quantum system (representing ambient quantum probability) to simulate real-world uncertainty. This can be achieved through quantum random number generation.
    - The system's ability to "adjust" to this noise in a manner more accurate than classical systems is a key point of the experiment.
 
 7. **Final Outcome:**
