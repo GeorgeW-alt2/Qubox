@@ -21,10 +21,11 @@ class TemporalSpringSystem:
         return np.sin(2 * np.pi * self.oscillation_frequency * t)
     
     def time_based_random(self):
-        """Generate a time-based random number influenced by the oscillation."""
-        random.seed(self.oscillation())  # Use oscillation as the seed for randomness
-        return random.random()  # Return a pseudo-random number
-    
+        """Generate a time-based random number influenced by the current time."""
+        current_time = time.time()  # Get the current time in seconds
+        random.seed(current_time)  # Use current time as the seed for randomness
+        return random.random()  # Return a time based random number
+        
     def update_temporal_buffer(self, state):
         """Update the latent temporal buffer with the new state."""
         self.temporal_buffer.append(state)
