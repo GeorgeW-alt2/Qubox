@@ -3,7 +3,7 @@ import time
 import random
 import signal
 import sys
-
+buffer_len = 100
 class TemporalSpringSystem:
     def __init__(self, oscillation_frequency=0.1, max_buffer_depth=10, photon_threshold=0.5):
         self.oscillation_frequency = oscillation_frequency  # Frequency of oscillation
@@ -56,9 +56,10 @@ class TemporalSpringSystem:
         
         # Check if the sentinel condition is met
         print(f"Sentinel triggered. Updating temporal buffer...")
-        state = self.get_current_state()  # Generate a state to update the buffer
-        self.update_temporal_buffer(state)
-        print(f"Temporal buffer updated with state: {state:.4f}")
+        state = 1  # Generate a state to update the buffer
+        for i in range(buffer_len):
+            self.update_temporal_buffer(state)
+        print(f"Temporal buffer updated with state: {state:.4f} * {buffer_len} ")
         
         # Exit the program after handling the interrupt
         sys.exit(0)
@@ -73,7 +74,7 @@ class TemporalSpringSystem:
         cost = self.cost_function()
         
         # Print the state, cost, and photon detection info
-        print(f"State: {state:.4f}, Cost: {cost}, Photon Detected: {photon_detected}")
+        print(f"State: {state:.4f}, Photon Detected: {photon_detected}")
         
         # Simulate the "chronological forcing" by updating time offset
         self.time_offset += 0.1  # Increment time to simulate time flow
