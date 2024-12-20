@@ -3,9 +3,8 @@ import time
 import random
 import signal
 import sys
-buffer_len = 100
 class TemporalSpringSystem:
-    def __init__(self, oscillation_frequency=0.1, max_buffer_depth=10, photon_threshold=0.5):
+    def __init__(self, oscillation_frequency, max_buffer_depth, photon_threshold):
         self.oscillation_frequency = oscillation_frequency  # Frequency of oscillation
         self.max_buffer_depth = max_buffer_depth  # Maximum depth of latent temporal buffer
         self.photon_threshold = photon_threshold  # Threshold for photon detection (0 to 1)
@@ -57,9 +56,9 @@ class TemporalSpringSystem:
         # Check if the sentinel condition is met
         print(f"Sentinel triggered. Updating temporal buffer...")
         state = 1  # Generate a state to update the buffer
-        for i in range(buffer_len):
+        for i in range(self.max_buffer_depth):
             self.update_temporal_buffer(state)
-        print(f"Temporal buffer updated with state: {state:.4f} * {buffer_len} ")
+        print(f"Temporal buffer updated with state: {state:.4f} * {self.max_buffer_depth} ")
         
         # Exit the program after handling the interrupt
         sys.exit(0)
@@ -87,7 +86,7 @@ class TemporalSpringSystem:
 
 
 # Initialize the TemporalSpringSystem with photon measurement
-temporal_system = TemporalSpringSystem(oscillation_frequency=0.1, max_buffer_depth=5, photon_threshold=0.4)
+temporal_system = TemporalSpringSystem(oscillation_frequency=0.1, max_buffer_depth=100, photon_threshold=0.4)
 
 # Run the system for a number of steps to simulate time-based, oscillatory behavior, and photon detection
 temporal_system.run(steps=50)
