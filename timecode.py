@@ -5,7 +5,7 @@ import signal
 import sys
 import serial  # Import the serial library for communication with the serial device
 import matplotlib.pyplot as plt  # Import matplotlib for plotting
-lambda_time = 0.1001
+lambda_time = 0.1001 #time sleep changing from 0.1 to 0.001, has interesting results
 class TemporalSpringSystem:
     def __init__(self, oscillation_frequency, max_buffer_depth, photon_threshold, serial_port='COM3'):
         self.oscillation_frequency = oscillation_frequency  # Frequency of oscillation
