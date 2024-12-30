@@ -215,9 +215,36 @@ class QuantumCommunicator:
         
     def update_gui(self, frame):
         """Update the GUI with the latest camera frame"""
-        # Convert frame to PhotoImage and update label
-        pass  # Implementation depends on GUI framework
-        
+        try:
+            # Resize frame for display (using INTER_NEAREST for better performance)
+            display_width = 640
+            display_height = 480
+            frame = cv2.resize(frame, (display_width, display_height), interpolation=cv2.INTER_NEAREST)
+            
+            # Convert to bytes in a more efficient way
+            img_bytes = cv2.imencode('.ppm', frame)[1].tobytes()
+            
+            # Create new PhotoImage only if needed
+            if not hasattr(self, '_photo_image') or \
+               self._photo_image.width() != display_width or \
+               self._photo_image.height() != display_height:
+                self._photo_image = tk.PhotoImage(width=display_width, height=display_height)
+                self.camera_label.configure(image=self._photo_image)
+            
+            # Update existing PhotoImage instead of creating a new one
+            self._photo_image.configure(data=img_bytes)
+            
+            # Update only when needed
+            if time.time() - getattr(self, '_last_update', 0) > 0.033:  # Limit to ~30 FPS
+                self.root.update_idletasks()
+                self._last_update = time.time()
+                
+        except tk.TclError:
+            # Handle case where window is closed
+            self.running = False
+        except Exception as e:
+            print(f"Error updating GUI: {e}")
+            
     def run(self):
         """Start the application"""
         self.start_camera()
