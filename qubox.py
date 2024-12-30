@@ -17,7 +17,7 @@ class QuantumCommunicator:
         self.cyc = 0
         self.swi = 0
         self.longcyc = 10
-        self.numa = "0,1,0,1,0,1,0,1,0,1"  # Sample quantum state sequence
+        self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100))  # Sample quantum state sequence
         self.corr = 3
         self.prime = 0
         self.ghostprotocol = 0
@@ -165,7 +165,17 @@ class QuantumCommunicator:
                 self.ghostprotocollast = self.ghostprotocol
                 self.GhostIterate = 0
                 self.update_output("******\n")
-    
+                
+    def send_message(self):
+        """Send a quantum message"""
+        input_text = "test"  # Could be modified to accept user input
+        binary_val = ''.join(format(ord(c), '08b') for c in input_text)
+        integer = int(binary_val, 2)
+        
+        if integer <= self.ghostprotocol * self.range:
+            self.numa += ",".join('9' for _ in range(500))
+            self.update_output(f"Sending message: {input_text}\n")
+            
     def update_output(self, message):
         """Simulate output update (e.g., printing or logging)"""
         print(message)
