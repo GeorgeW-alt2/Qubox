@@ -1,123 +1,91 @@
 import cv2
 import numpy as np
-import time
-from datetime import datetime
-import tkinter as tk
-from tkinter import ttk, Text
-import threading
 
 class QuantumCommunicator:
-    def __init__(self):
-        # Initialize variables matching the original code
-        self.swi = 0
-        self.swi2 = 0
-        self.sensitivity = 70
-        self.longcyc = 2
-        self.longcyc2 = 3
-        self.minPeriod = 1
-        self.corr = 0
+    def __init__(self, sensitivity=500):
+        self.sensitivity = sensitivity
+        self.data2 = None
+        self.capture = cv2.VideoCapture(0)
+        
+        # Initialize quantum state variables
         self.Do = 0
         self.Do2 = 0
+        self.qu = 0
         self.it = 0
-        self.test = 0
-        self.nul = 0
-        self.ack = 0
         self.and_count = 0
         self.or_count = 0
         self.cyc = 0
-        self.cycle = 0
-        self.qu = 0
-        self.range = 10000000
-        self.ghostprotocol = 0
+        self.swi = 0
+        self.longcyc = 10
+        self.numa = "0,1,0,1,0,1,0,1,0,1"  # Sample quantum state sequence
+        self.corr = 3
         self.prime = 0
+        self.ghostprotocol = 0
         self.ghostprotocollast = 0
         self.GhostIterate = 0
-        self.testchecknum = 244939252
-        
-        # Initialize camera-related variables
-        self.camera = None
-        self.prev_frame = None
-        self.data2 = None
-        self.running = False
-        
-        # Initialize quantum state
-        self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100))
-        
-        # Initialize GUI
-        self.setup_gui()
-        
-    def setup_gui(self):
-        """Setup the GUI window with camera view and controls"""
-        self.root = tk.Tk()
-        self.root.title("Quantum Communication Protocol")
-        
-        # Main frame
-        main_frame = ttk.Frame(self.root)
-        main_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        
-        # Camera frame
-        self.camera_label = ttk.Label(main_frame)
-        self.camera_label.pack(pady=10)
-        
-        # Control buttons
-        btn_frame = ttk.Frame(main_frame)
-        btn_frame.pack(pady=10)
-        
-        send_btn = ttk.Button(btn_frame, text="Send", command=self.send_message)
-        send_btn.pack(side=tk.LEFT, padx=5)
-        
-        # Output text area
-        self.output_text = Text(main_frame, height=10, width=50, bg='#333333', fg='white')
-        self.output_text.pack(pady=10)
-        
-    def start_camera(self):
-        """Initialize and start the camera"""
-        self.camera = cv2.VideoCapture(0)
-        if not self.camera.isOpened():
-            raise ValueError("Could not open camera")
-        
-        self.running = True
-        self.camera_thread = threading.Thread(target=self.process_camera)
-        self.camera_thread.start()
-        
+        self.testchecknum = 5
+        self.ack = 0
+        self.nul = 0
+    
     def process_camera(self):
-        """Main camera processing loop"""
-        while self.running:
-            ret, frame = self.camera.read()
+        """Process camera feed and detect motion in quadrants"""
+        while True:
+            ret, frame = self.capture.read()
             if not ret:
                 break
-                
-            # Process motion data
+            
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(gray, (21, 21), 0)
             
-            if self.test == 0:
-                self.data2 = gray.copy()
-                self.test = 1
-            else:
-                self.process_motion(gray)
-                self.test = 0
+            if self.data2 is None:
+                self.data2 = gray
+                continue
             
-            # Update GUI with camera frame
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            self.update_gui(frame)
+            self.process_motion(frame, gray)
+            self.data2 = gray
             
-    def process_motion(self, current_frame):
+            # Display the resulting frame
+            cv2.imshow('Motion Detection', frame)
+            
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        
+        self.capture.release()
+        cv2.destroyAllWindows()
+
+    def process_motion(self, current_frame, gray_frame):
         """Process motion detection and quantum logic"""
-        if self.data2 is None:
-            return
-            
         # Calculate motion intensity
-        frame_delta = cv2.absdiff(self.data2, current_frame)
+        frame_delta = cv2.absdiff(self.data2, gray_frame)
         thresh = cv2.threshold(frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
         
-        # Count motion pixels
-        b = np.sum(thresh > 10)
-        bb = np.sum((thresh > 10) & (frame_delta > 0))
+        # Divide the frame into 128 quadrants (8 rows x 16 columns)
+        height, width = thresh.shape
+        quadrant_width = width // 16
+        quadrant_height = height // 8
         
-        # Apply quantum logic
-        self.apply_quantum_logic(b, bb)
-        
+        for row in range(8):
+            for col in range(16):
+                # Define quadrant region
+                x1 = col * quadrant_width
+                y1 = row * quadrant_height
+                x2 = (col + 1) * quadrant_width
+                y2 = (row + 1) * quadrant_height
+                
+                # Check if there's motion in the quadrant
+                quadrant = thresh[y1:y2, x1:x2]
+                motion_detected = np.sum(quadrant > 10) > self.sensitivity
+                
+                # If motion detected, mark the quadrant
+                if motion_detected:
+                    self.apply_quantum_logic(row, col)  # Apply quantum logic based on quadrant
+
+                    self.highlight_quadrant(current_frame, x1, y1, x2, y2)
+    
+    def highlight_quadrant(self, frame, x1, y1, x2, y2):
+        """Highlight a quadrant with motion"""
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+
     def apply_quantum_logic(self, b, bb):
         """Apply quantum state logic based on motion detection"""
         if self.Do == 1:
@@ -197,69 +165,11 @@ class QuantumCommunicator:
                 self.ghostprotocollast = self.ghostprotocol
                 self.GhostIterate = 0
                 self.update_output("******\n")
-                
-    def send_message(self):
-        """Send a quantum message"""
-        input_text = "test"  # Could be modified to accept user input
-        binary_val = ''.join(format(ord(c), '08b') for c in input_text)
-        integer = int(binary_val, 2)
-        
-        if integer <= self.ghostprotocol * self.range:
-            self.numa += ",".join('9' for _ in range(500))
-            self.update_output(f"Sending message: {input_text}\n")
-            
-    def update_output(self, text):
-        """Update the output text area"""
-        self.output_text.insert(tk.END, text)
-        self.output_text.see(tk.END)
-        
-    def update_gui(self, frame):
-        """Update the GUI with the latest camera frame"""
-        try:
-            # Resize frame for display (using INTER_NEAREST for better performance)
-            display_width = 640
-            display_height = 480
-            frame = cv2.resize(frame, (display_width, display_height), interpolation=cv2.INTER_NEAREST)
-            
-            # Convert to bytes in a more efficient way
-            img_bytes = cv2.imencode('.ppm', frame)[1].tobytes()
-            
-            # Create new PhotoImage only if needed
-            if not hasattr(self, '_photo_image') or \
-               self._photo_image.width() != display_width or \
-               self._photo_image.height() != display_height:
-                self._photo_image = tk.PhotoImage(width=display_width, height=display_height)
-                self.camera_label.configure(image=self._photo_image)
-            
-            # Update existing PhotoImage instead of creating a new one
-            self._photo_image.configure(data=img_bytes)
-            
-            # Update only when needed
-            if time.time() - getattr(self, '_last_update', 0) > 0.033:  # Limit to ~30 FPS
-                self.root.update_idletasks()
-                self._last_update = time.time()
-                
-        except tk.TclError:
-            # Handle case where window is closed
-            self.running = False
-        except Exception as e:
-            print(f"Error updating GUI: {e}")
-            
-    def run(self):
-        """Start the application"""
-        self.start_camera()
-        self.root.mainloop()
-        
-    def cleanup(self):
-        """Clean up resources"""
-        self.running = False
-        if self.camera is not None:
-            self.camera.release()
-        cv2.destroyAllWindows()
+    
+    def update_output(self, message):
+        """Simulate output update (e.g., printing or logging)"""
+        print(message)
         
 if __name__ == "__main__":
-    app = QuantumCommunicator()
-    try:
-        app.run()
-    finally:
-        app.cleanup()
+    communicator = QuantumCommunicator(sensitivity=500)
+    communicator.process_camera()
