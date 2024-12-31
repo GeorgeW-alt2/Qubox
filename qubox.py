@@ -123,7 +123,7 @@ class QuantumCommunicator:
         """Check and process quantum states"""
         check = self.numa.split(",")
         
-        if self.and_count > self.corr and self.cyc < len(check):
+        if self.and_count > self.corr and self.cyc < len(check): 
             if check[self.cyc] == str(self.qu):
                 if self.swi == self.longcyc:
                     self.qu = np.random.randint(0, 2)
@@ -135,7 +135,7 @@ class QuantumCommunicator:
                 self.cyc += 1
                 self.prime = 0
                 
-        if self.or_count > self.corr and self.cyc < len(check):
+        if self.or_count > self.corr and self.cyc < len(check): # negative time/phase abnormality
             if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
                     self.qu = np.random.randint(0, 2)
@@ -146,7 +146,7 @@ class QuantumCommunicator:
                 self.or_count = 0
                 self.and_count = 0
                 self.cyc += 1
-                self.process_ghost_protocol()
+                self.process_ghost_protocol()# paradox injection 
                 
     def process_ghost_protocol(self):
         """Process ghost protocol states"""
@@ -164,11 +164,11 @@ class QuantumCommunicator:
             if self.ghostprotocol * self.range == self.ghostprotocollast + self.range:
                 self.ghostprotocollast = self.ghostprotocol
                 self.GhostIterate = 0
-                self.update_output("******\n")
+                self.update_output("******\n") #apparent location in state space
                 
     def send_message(self):
         """Send a quantum message"""
-        input_text = "test"  # Could be modified to accept user input
+        input_text = "test"  # Could be modified to accept user input or an any conditional
         binary_val = ''.join(format(ord(c), '08b') for c in input_text)
         integer = int(binary_val, 2)
         
