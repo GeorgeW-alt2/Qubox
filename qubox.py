@@ -4,7 +4,6 @@ import os
 from datetime import datetime
 from collections import deque
 
-test_int = 10000000000000 #requires number larger than state space search
         
 class QuantumCommunicator:
     def __init__(self, sensitivity=500):
@@ -42,7 +41,8 @@ class QuantumCommunicator:
         
         # Ghost protocol variables
         self.ghost_messages = deque(maxlen=10)  # Increased to show more messages
-        self.range = 10000000000000000
+        self.range = 100000000#1952805748#test_int
+                            
         self.last_ghost_check = 0
         self.prime = 0
         self.prime_threshold = 10  # Add a maximum threshold
@@ -78,7 +78,6 @@ class QuantumCommunicator:
         
         print(f"\nPROTOCOL STATUS:")
         print(f"Ghost Protocol Value: {self.ghostprotocol * self.range}")
-        print(f"Target Value: {test_int}")
         print(f"Ghost Protocol State: {self.ghostprotocol}")
         print(f"Prime State: {self.prime}")
         print(f"Acknowledgments (ACK): {self.ack}")
@@ -253,16 +252,9 @@ class QuantumCommunicator:
                 with open("log.txt", "a") as file:
                     file.write(f"{message}\n")
             
-            f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value})"
-            # Check for test_int requirement
-            if current_value >= test_int and self.last_ghost_check != current_value:
-                self.ghost_messages.append(f"Range requirement met: {current_value} >= {test_int}")
-                self.last_ghost_check = current_value
-                
-            
             # Regular protocol updates
             if current_value != self.ghostprotocollast:
-                msg = f"Protocol state: {current_value} (End state: {test_int})"
+                msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
                 
@@ -279,16 +271,13 @@ def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
         input_text = "test"
 
-        test_sha256 ="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-        test_hex = "9f86d081884c7d65"
-        test_decimal = 11495104353665842533
+        sha256 ="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
         # Generate SHA-256 hash of the input text
         sha256_hash = hashlib.sha256(input_text.encode()).hexdigest()
-        binary_val = ''.join(format(ord(c), '08b') for c in "9f86d081884c7d65")
+        binary_val = ''.join(format(ord(c), '08b') for c in input_text)
         decimal_val = int(binary_val, 2)  # Convert binary to decimal, ACKs/NUL ratio slows down to ~5 integers per refresh if number is surpassed
-        decimal_val = 5 # ACKs/NUL ratio slows down if number is surpassed
         # Using test_int as our target value
-        if decimal_val <= self.ghostprotocol * self.range:
+        if decimal_val <= self.ghostprotocol * self.range and sha256_hash == sha256:
             self.numa += ",".join('9' for _ in range(500))
             self.ghost_messages.append(f">>> End state {decimal_val} reached <<<")
             
