@@ -4,10 +4,9 @@ import os
 from datetime import datetime
 from collections import deque
 
-        
 class QuantumCommunicator:
     def __init__(self, sensitivity=500):
-        # Previous initialization code remains the same
+        # Camera and processing setup
         self.sensitivity = sensitivity
         self.data2 = None
         self.capture = cv2.VideoCapture(0)
@@ -29,8 +28,13 @@ class QuantumCommunicator:
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
+        
+        # ACK and status tracking
         self.ack = 0
         self.nul = 0
+        self.last_ack_count = 0
+        self.start_time = datetime.now()
+        self.ack_history = []
         
         # Status tracking variables
         self.motion_frame_count = 0
@@ -40,29 +44,59 @@ class QuantumCommunicator:
         self.total_frames = 0
         
         # Ghost protocol variables
-        self.ghost_messages = deque(maxlen=10)  # Increased to show more messages
-        self.range = 100000000
+        self.ghost_messages = deque(maxlen=4)
+        self.range = 10
         self.last_ghost_check = 0
         self.prime = 0
-        self.prime_threshold = 10  # Add a maximum threshold
-    
-    
+        self.prime_threshold = 10
+
+    def analyze_ack_rate(self):
+        """Calculate and return ACK rate statistics"""
+        current_time = datetime.now()
+        elapsed_time = (current_time - self.start_time).total_seconds()
+        
+        # Calculate rates
+        ack_delta = self.ack - self.last_ack_count
+        refreshes = elapsed_time / self.status_update_interval
+        
+        stats = {
+            'acks_per_refresh': round(ack_delta / refreshes if refreshes > 0 else 0, 2),
+            'acks_per_second': round(ack_delta / elapsed_time if elapsed_time > 0 else 0, 2),
+            'total_acks': self.ack,
+            'ack_delta': ack_delta,
+            'elapsed_time': round(elapsed_time, 2)
+        }
+        
+        # Update tracking variables
+        self.last_ack_count = self.ack
+        self.ack_history.append(stats)
+        
+        return stats
+
     def clear_console(self):
         """Clear the console screen"""
-        os.system('cls' if os.name == 'nt' else 'clear')                
-    
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     def display_status(self):
-        """Display current status information"""
+        """Display current status information with ACK rate analysis"""
         current_time = datetime.now()
         if (current_time - self.last_status_update).total_seconds() < self.status_update_interval:
             return
             
         self.clear_console()
+        ack_stats = self.analyze_ack_rate()
+        
         print("=" * 50)
         print("QUANTUM COMMUNICATOR STATUS")
         print("=" * 50)
         print(f"Time: {current_time.strftime('%H:%M:%S')}")
+        
+        print(f"\nACK RATE ANALYSIS:")
+        print(f"ACKs per Refresh: {ack_stats['acks_per_refresh']}")
+        print(f"ACKs per Second: {ack_stats['acks_per_second']}")
+        print(f"Total ACKs: {ack_stats['total_acks']}")
+        print(f"Recent ACK Delta: {ack_stats['ack_delta']}")
+        print(f"Elapsed Time: {ack_stats['elapsed_time']}s")
         
         print(f"\nQUANTUM STATES:")
         print(f"Current Quantum State (qu): {self.qu}")
@@ -89,16 +123,62 @@ class QuantumCommunicator:
         else:
             print("No ghost protocol messages yet")
         
-        print(f"\nACTIVE QUADRANTS: {len(self.active_quadrants)}")
-        if self.active_quadrants:
-            quadrants_str = ", ".join([f"({x},{y})" for x, y in self.active_quadrants])
-            print(f"Locations: {quadrants_str}")
+        #print(f"\nACTIVE QUADRANTS: {len(self.active_quadrants)}")
+        #if self.active_quadrants:
+            #quadrants_str = ", ".join([f"({x},{y})" for x, y in self.active_quadrants])
+            #print(f"Locations: {quadrants_str}")
         
-        print("\nPress 'Q' to exit")
+        #print("\nPress 'Q' to exit")
         print("=" * 50)
+        
+        # Log ACK stats to file
+        self.log_ack_stats(ack_stats)
         
         self.last_status_update = current_time
         self.active_quadrants.clear()
+
+    def log_ack_stats(self, stats):
+        """Log ACK statistics and ghost protocol messages to a file"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = (
+            f"{current_time}, "
+            f"ACKs/Refresh: {stats['acks_per_refresh']}, "
+            f"ACKs/Second: {stats['acks_per_second']}, "
+            f"Total ACKs: {stats['total_acks']}, "
+            f"Delta: {stats['ack_delta']}, "
+            f"Elapsed: {stats['elapsed_time']}s, "
+            f"Ghost Protocol: {self.ghostprotocol}, "
+            f"Ghost Value: {self.ghostprotocol * self.range}"
+        )
+        
+        log_entry += "\n"
+        
+        with open("ack_stats.log", "a") as f:
+            f.write(log_entry)
+
+    def process_ghost_protocol(self):
+        """Process ghost protocol states"""
+        self.ghostprotocol += 1
+        current_value = self.ghostprotocol * self.range
+        
+        if self.prime > 1 and self.ghostprotocol > 3:
+            if self.GhostIterate == 0:
+                self.ghostprotocollast = current_value
+                self.GhostIterate += 1
+                current_time = datetime.now()
+                message = f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value}), Time: {current_time.strftime('%H:%M:%S')}"
+                self.ghost_messages.append(message)
+                self.last_ghost_check = current_value
+                
+                # Log initialization separately
+                with open("ack_stats.log", "a") as f:
+                    f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')}, GHOST PROTOCOL INITIALIZED, Value: {current_value}\n")
+            
+            if current_value != self.ghostprotocollast:
+                msg = f"Protocol state: {current_value}"
+                self.ghost_messages.append(msg)
+                self.ghostprotocollast = current_value
+                
 
     def process_camera(self):
         """Process camera feed and detect motion in quadrants"""
@@ -136,7 +216,6 @@ class QuantumCommunicator:
         frame_delta = cv2.absdiff(self.data2, gray_frame)
         thresh = cv2.threshold(frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
         
-        # Check if there's any significant motion in the frame
         motion_detected_in_frame = False
         
         height, width = thresh.shape
@@ -161,7 +240,7 @@ class QuantumCommunicator:
         
         if motion_detected_in_frame:
             self.motion_frame_count += 1
-    
+
     def highlight_quadrant(self, frame, x1, y1, x2, y2):
         """Highlight a quadrant with motion"""
         cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
@@ -178,7 +257,6 @@ class QuantumCommunicator:
                 self.it += 1
             self.it = 0
             
-        # Process quantum states
         if 4 < b < 11 or 4 < bb < 11:
             self.or_count += 1
             
@@ -188,7 +266,7 @@ class QuantumCommunicator:
                 self.toggle_quantum_state()
                 
         self.check_quantum_states()
-        
+
     def toggle_quantum_state(self):
         """Toggle quantum state based on current conditions"""
         if self.qu == 1 and self.it == 0:
@@ -198,9 +276,9 @@ class QuantumCommunicator:
             self.qu = 1
             self.it += 1
         self.it = 0
-        
+
     def check_quantum_states(self):
-        """Check and process quantum states with proper prime handling"""
+        """Check and process quantum states"""
         check = self.numa.split(",")
         
         if self.and_count > self.corr and self.cyc < len(check):
@@ -208,17 +286,16 @@ class QuantumCommunicator:
                 if self.swi == self.longcyc:
                     self.qu = np.random.randint(0, 2)
                     self.swi = 0
-                    self.prime = 0  # Prime gets reset to 0 here
+                    self.prime = 0
                 self.swi += 1
                 self.Do = 1
                 self.ack += 1
                 self.and_count = 0
                 self.cyc += 1
-                # Only reset prime if it exceeds threshold
                 if self.prime >= self.prime_threshold:
                     self.prime = 0
                 else:
-                    self.prime += 1  # Increment prime with proper bounds
+                    self.prime += 1
                 
         if self.or_count > self.corr and self.cyc < len(check):
             if check[self.cyc] != str(self.qu):
@@ -231,63 +308,64 @@ class QuantumCommunicator:
                 self.or_count = 0
                 self.and_count = 0
                 self.cyc += 1
-                self.prime = min(self.prime + 1, self.prime_threshold)  # Increment with ceiling
+                self.prime = min(self.prime + 1, self.prime_threshold)
                 self.process_ghost_protocol()
-                
+
     def process_ghost_protocol(self):
         """Process ghost protocol states"""
         self.ghostprotocol += 1
         current_value = self.ghostprotocol * self.range
         
         if self.prime > 1 and self.ghostprotocol > 3:
-            # Initial protocol start
             if self.GhostIterate == 0:
                 self.ghostprotocollast = current_value
                 self.GhostIterate += 1
                 current_time = datetime.now()
-                self.ghost_messages.append(f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value}), Time: {current_time.strftime('%H:%M:%S')}")
                 message = f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value}), Time: {current_time.strftime('%H:%M:%S')}"
+                self.ghost_messages.append(message)
                 self.last_ghost_check = current_value
-                with open("log.txt", "a") as file:
-                    file.write(f"{message}\n")
+                
             
-            # Regular protocol updates
             if current_value != self.ghostprotocollast:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
                 
-                # Check if we've reached a milestone
                 if (current_value * self.range) == (self.ghostprotocollast + self.range):
-
                     self.ghost_messages.append("****** Milestone reached ******")
-    
+
     def update_output(self, message):
         """Update output display"""
         self.ghost_messages.append(message.strip())
         
-def decimal_to_binary(n):
-    if n == 0:
-        return "0"
-    binary = ""
-    while n > 0:
-        binary = str(n % 2) + binary
-        n = n // 2
-    return binary
-import hashlib
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-        input_text = "test"
-
-        sha256 ="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-        # Generate SHA-256 hash of the input text
-        sha256_hash = hashlib.sha256(input_text.encode()).hexdigest()
-        binary_val = decimal_to_binary(self.ghostprotocol * self.range)
-        decimal_val = int(binary_val, 2)  # Convert binary to decimal, ACKs/NUL ratio slows down to ~5 integers per refresh if number is surpassed
+        PIN = 2455 #Guess PIN
         # Using test_int as our target value
-        if decimal_val <= self.ghostprotocol * self.range and sha256_hash.startswith('0' * 17) == True:
-            self.numa += ",".join('9' for _ in range(500)) #gives decimal range
+        if PIN <= self.ghostprotocol * self.range :
+            self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
             
+
 if __name__ == "__main__":
-    communicator = QuantumCommunicator(sensitivity=500)
-    communicator.process_camera()
+    try:
+        # Create logs directory if it doesn't exist
+        if not os.path.exists('logs'):
+            os.makedirs('logs')
+            
+        # Initialize the communicator
+        communicator = QuantumCommunicator(sensitivity=500)
+        print("Quantum Communicator initialized. Starting camera feed...")
+        
+        # Start processing
+        communicator.process_camera()
+        
+    except KeyboardInterrupt:
+        print("\nShutting down gracefully...")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        # Clean up
+        if hasattr(communicator, 'capture'):
+            communicator.capture.release()
+        cv2.destroyAllWindows()
+        print("Shutdown complete.")
