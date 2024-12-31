@@ -42,7 +42,7 @@ class QuantumCommunicator:
         
         # Ghost protocol variables
         self.ghost_messages = deque(maxlen=10)  # Increased to show more messages
-        self.range = 10000
+        self.range = 10000000000000000
         self.last_ghost_check = 0
         self.prime = 0
         self.prime_threshold = 10  # Add a maximum threshold
@@ -274,12 +274,18 @@ class QuantumCommunicator:
     def update_output(self, message):
         """Update output display"""
         self.ghost_messages.append(message.strip())
-    
+import hashlib
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
         input_text = "test"
-        binary_val = ''.join(format(ord(c), '08b') for c in input_text)
-        decimal_val = int(binary_val, 2)  # Convert binary to decimal, ACKs/NUL ratio slows down if number is surpassed
+
+        test_sha256 ="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+        test_hex = "9f86d081884c7d65"
+        test_decimal = 11495104353665842533
+        # Generate SHA-256 hash of the input text
+        sha256_hash = hashlib.sha256(input_text.encode()).hexdigest()
+        binary_val = ''.join(format(ord(c), '08b') for c in "9f86d081884c7d65")
+        decimal_val = int(binary_val, 2)  # Convert binary to decimal, ACKs/NUL ratio slows down to ~5 integers per refresh if number is surpassed
         decimal_val = 5 # ACKs/NUL ratio slows down if number is surpassed
         # Using test_int as our target value
         if decimal_val <= self.ghostprotocol * self.range:
