@@ -61,8 +61,7 @@ class QuantumCommunicator:
         # Using test_int as our target value
         if test_int <= self.ghostprotocol * self.range:
             self.numa += ",".join('9' for _ in range(500))
-            self.ghost_messages.append(f">>> Message sent: {input_text} <<<")
-            self.ghost_messages.append(f">>> Target value {test_int} reached <<<")
+            self.ghost_messages.append(f">>> End state {test_int} reached <<<")
 
     def display_status(self):
         """Display current status information"""
