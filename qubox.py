@@ -276,7 +276,7 @@ class QuantumCommunicator:
         self.ghost_messages.append(message.strip())
     
 def send_message(self):
-        """Send a quantum message when conditions are met."""
+        """Send a quantum message when conditions are met, could be a message or math."""
         input_text = "test"
         binary_val = ''.join(format(ord(c), '08b') for c in input_text)
         decimal_val = int(binary_val, 2)  # Convert binary to decimal, ACKs/NUL ratio slows down if number is surpassed
