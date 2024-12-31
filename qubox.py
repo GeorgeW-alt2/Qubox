@@ -42,7 +42,7 @@ class QuantumCommunicator:
         
         # Ghost protocol variables
         self.ghost_messages = deque(maxlen=10)  # Increased to show more messages
-        self.range = 100
+        self.range = 10000
         self.last_ghost_check = 0
         self.prime = 0
         self.prime_threshold = 10  # Add a maximum threshold
@@ -52,16 +52,6 @@ class QuantumCommunicator:
         """Clear the console screen"""
         os.system('cls' if os.name == 'nt' else 'clear')                
     
-    
-    def send_message(self):
-        """Send a quantum message when conditions are met"""
-        input_text = "test"
-        binary_val = ''.join(format(ord(c), '08b') for c in input_text)
-        
-        # Using test_int as our target value
-        if test_int <= self.ghostprotocol * self.range:
-            self.numa += ",".join('9' for _ in range(500))
-            self.ghost_messages.append(f">>> End state {test_int} reached <<<")
 
     def display_status(self):
         """Display current status information"""
@@ -256,9 +246,14 @@ class QuantumCommunicator:
             if self.GhostIterate == 0:
                 self.ghostprotocollast = current_value
                 self.GhostIterate += 1
-                self.ghost_messages.append(f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value})")
+                current_time = datetime.now()
+                self.ghost_messages.append(f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value}), Time: {current_time.strftime('%H:%M:%S')}")
+                message = f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value}), Time: {current_time.strftime('%H:%M:%S')}"
                 self.last_ghost_check = current_value
+                with open("log.txt", "a") as file:
+                    file.write(f"{message}\n")
             
+            f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value})"
             # Check for test_int requirement
             if current_value >= test_int and self.last_ghost_check != current_value:
                 self.ghost_messages.append(f"Range requirement met: {current_value} >= {test_int}")
@@ -267,29 +262,30 @@ class QuantumCommunicator:
             
             # Regular protocol updates
             if current_value != self.ghostprotocollast:
-                msg = f"Protocol state: {current_value} (Target: {test_int})"
+                msg = f"Protocol state: {current_value} (End state: {test_int})"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
                 
                 # Check if we've reached a milestone
-                if current_value % (self.range * 5) == 0:
+                if (current_value * self.range) == (self.ghostprotocollast + self.range):
+
                     self.ghost_messages.append("****** Milestone reached ******")
     
     def update_output(self, message):
         """Update output display"""
         self.ghost_messages.append(message.strip())
     
-    def send_message(self):
-        """Send a quantum message"""
-        input_text = "test"  # Could be modified to accept user input or an any conditional
+def send_message(self):
+        """Send a quantum message when conditions are met."""
+        input_text = "test"
         binary_val = ''.join(format(ord(c), '08b') for c in input_text)
-        integer = int(binary_val, 2)
-        integer = test_int
-
-        if integer <= self.ghostprotocol * self.range:
+        decimal_val = int(binary_val, 2)  # Convert binary to decimal, ACKs/NUL ratio slows down if number is surpassed
+        decimal_val = 5 # ACKs/NUL ratio slows down if number is surpassed
+        # Using test_int as our target value
+        if decimal_val <= self.ghostprotocol * self.range:
             self.numa += ",".join('9' for _ in range(500))
-            self.update_output(f"Sending message: {input_text}\n")
-
+            self.ghost_messages.append(f">>> End state {decimal_val} reached <<<")
+            
 if __name__ == "__main__":
     communicator = QuantumCommunicator(sensitivity=500)
     communicator.process_camera()
