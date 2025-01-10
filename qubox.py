@@ -240,10 +240,10 @@ class QuantumCommunicator:
                 self.it += 1
             self.it = 0
             
-        if 4 < b < 11 or 4 < bb < 11:
+        if b < 11 or 4 < bb:
             self.or_count += 1
             
-        if 4 < b < 11 and 4 < bb < 11:
+        if b < 11 and 4 < bb:
             self.and_count += 1
             if self.Do == 1:
                 self.toggle_quantum_state()
