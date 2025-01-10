@@ -45,10 +45,15 @@ class QuantumCommunicator:
         
         # Ghost protocol variables
         self.ghost_messages = deque(maxlen=4)
-        self.range = 10
+        self.range = 1
         self.last_ghost_check = 0
         self.prime = 0
         self.prime_threshold = 10
+        
+        # OR state tracking
+        self.or_state_duration = 0
+        self.or_state_threshold = 5  # Number of consecutive seconds to trigger message
+        self.last_or_state_time = None
 
     def analyze_ack_rate(self):
         """Calculate and return ACK rate statistics"""
@@ -106,6 +111,9 @@ class QuantumCommunicator:
         print(f"\nDETECTION COUNTERS:")
         print(f"AND Gate Detections: {self.and_count}/{self.corr}")
         print(f"OR Gate Detections: {self.or_count}/{self.corr}")
+        if self.last_or_state_time:
+            or_duration = (current_time - self.last_or_state_time).total_seconds()
+            print(f"Current OR State Duration: {or_duration:.2f}s")
         motion_percentage = (self.motion_frame_count / max(1, self.total_frames)) * 100
         print(f"Motion Detected: {self.motion_frame_count} frames ({motion_percentage:.1f}%)")
         
@@ -123,12 +131,6 @@ class QuantumCommunicator:
         else:
             print("No ghost protocol messages yet")
         
-        #print(f"\nACTIVE QUADRANTS: {len(self.active_quadrants)}")
-        #if self.active_quadrants:
-            #quadrants_str = ", ".join([f"({x},{y})" for x, y in self.active_quadrants])
-            #print(f"Locations: {quadrants_str}")
-        
-        #print("\nPress 'Q' to exit")
         print("=" * 50)
         
         # Log ACK stats to file
@@ -151,34 +153,14 @@ class QuantumCommunicator:
             f"Ghost Value: {self.ghostprotocol * self.range}"
         )
         
+        if self.last_or_state_time:
+            or_duration = (datetime.now() - self.last_or_state_time).total_seconds()
+            log_entry += f", OR Duration: {or_duration:.2f}s"
+        
         log_entry += "\n"
         
         with open("ack_stats.log", "a") as f:
             f.write(log_entry)
-
-    def process_ghost_protocol(self):
-        """Process ghost protocol states"""
-        self.ghostprotocol += 1
-        current_value = self.ghostprotocol * self.range
-        
-        if self.prime > 1 and self.ghostprotocol > 3:
-            if self.GhostIterate == 0:
-                self.ghostprotocollast = current_value
-                self.GhostIterate += 1
-                current_time = datetime.now()
-                message = f"Ghost Protocol Initiated: {self.ghostprotocol} (Value: {current_value}), Time: {current_time.strftime('%H:%M:%S')}"
-                self.ghost_messages.append(message)
-                self.last_ghost_check = current_value
-                
-                # Log initialization separately
-                with open("ack_stats.log", "a") as f:
-                    f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')}, GHOST PROTOCOL INITIALIZED, Value: {current_value}\n")
-            
-            if current_value != self.ghostprotocollast:
-                msg = f"Protocol state: {current_value}"
-                self.ghost_messages.append(msg)
-                self.ghostprotocollast = current_value
-                
 
     def process_camera(self):
         """Process camera feed and detect motion in quadrants"""
@@ -280,7 +262,41 @@ class QuantumCommunicator:
     def check_quantum_states(self):
         """Check and process quantum states"""
         check = self.numa.split(",")
+        current_time = datetime.now()
         
+        # Process OR states
+        if self.or_count > self.corr and self.cyc < len(check):
+            if self.last_or_state_time is None:
+                self.last_or_state_time = current_time
+                self.ghost_messages.append(f"OR state initiated at {current_time.strftime('%H:%M:%S')}")
+            
+            or_duration = (current_time - self.last_or_state_time).total_seconds()
+            
+            if check[self.cyc] == str(self.qu):
+                if self.swi == self.longcyc:
+                    self.qu = np.random.randint(0, 2)
+                    self.swi = 0
+                self.swi += 1
+                self.Do = 1
+                self.nul += 1
+                self.or_count = 0
+                self.and_count = 0
+                self.cyc += 1
+                self.prime = min(self.prime + 1, self.prime_threshold)
+                
+                if or_duration >= self.or_state_threshold:
+                    message = f"Prolonged OR state detected: Duration {or_duration:.2f}s, Value: {self.qu}"
+                    self.ghost_messages.append(message)
+                
+                self.process_ghost_protocol()
+        else:
+            if self.last_or_state_time is not None:
+                or_duration = (current_time - self.last_or_state_time).total_seconds()
+                if or_duration >= self.or_state_threshold:
+                    self.ghost_messages.append(f"OR state ended after {or_duration:.2f}s")
+            self.last_or_state_time = None
+        
+        # Process AND states
         if self.and_count > self.corr and self.cyc < len(check):
             if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
@@ -296,20 +312,6 @@ class QuantumCommunicator:
                     self.prime = 0
                 else:
                     self.prime += 1
-                
-        if self.or_count > self.corr and self.cyc < len(check):
-            if check[self.cyc] == str(self.qu):
-                if self.swi == self.longcyc:
-                    self.qu = np.random.randint(0, 2)
-                    self.swi = 0
-                self.swi += 1
-                self.Do = 1
-                self.nul += 1
-                self.or_count = 0
-                self.and_count = 0
-                self.cyc += 1
-                self.prime = min(self.prime + 1, self.prime_threshold)
-                self.process_ghost_protocol()
 
     def process_ghost_protocol(self):
         """Process ghost protocol states"""
@@ -325,20 +327,19 @@ class QuantumCommunicator:
                 self.ghost_messages.append(message)
                 self.last_ghost_check = current_value
                 
+                # Log initialization
+                with open("ack_stats.log", "a") as f:
+                    f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')}, GHOST PROTOCOL INITIALIZED, Value: {current_value}\n")
             
             if current_value != self.ghostprotocollast:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
-                
-               
-    def update_output(self, message):
-        """Update output display"""
-        self.ghost_messages.append(message.strip())
+
         
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-        PIN = 12455 #Guess PIN
+        PIN = 2455 #Guess PIN
         # Using test_int as our target value
         if PIN >= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
