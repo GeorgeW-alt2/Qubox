@@ -3,7 +3,7 @@ import numpy as np
 import os
 from datetime import datetime
 from collections import deque
-
+import random
 class QuantumCommunicator:
     def __init__(self, sensitivity=500):
         # Camera and processing setup
@@ -28,7 +28,7 @@ class QuantumCommunicator:
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        
+        self.PIN = random.randint(1000, 10000) #Guess PIN
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -45,7 +45,7 @@ class QuantumCommunicator:
         
         # Ghost protocol variables
         self.ghost_messages = deque(maxlen=4)
-        self.range = 1
+        self.range = 10
         self.last_ghost_check = 0
         self.prime = 0
         self.prime_threshold = 10
@@ -150,7 +150,8 @@ class QuantumCommunicator:
             f"Delta: {stats['ack_delta']}, "
             f"Elapsed: {stats['elapsed_time']}s, "
             f"Ghost Protocol: {self.ghostprotocol}, "
-            f"Ghost Value: {self.ghostprotocol * self.range}"
+            f"Ghost Value: {self.ghostprotocol * self.range},"
+            f"PIN: {self.PIN}"
         )
         
         if self.last_or_state_time:
@@ -339,7 +340,7 @@ class QuantumCommunicator:
         
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-        PIN = 2455 #Guess PIN
+        PIN = 3455 #Guess PIN
         # Using test_int as our target value
         if PIN >= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
