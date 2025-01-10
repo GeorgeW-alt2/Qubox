@@ -20,7 +20,7 @@ class QuantumCommunicator:
         self.or_count = 0
         self.cyc = 0
         self.swi = 0
-        self.longcyc = 10
+        self.longcyc = 3
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
@@ -48,7 +48,7 @@ class QuantumCommunicator:
         self.range = 10
         self.last_ghost_check = 0
         self.prime = 0
-        self.prime_threshold = 10
+        self.prime_threshold = 3
         
         # OR state tracking
         self.or_state_duration = 0
@@ -232,18 +232,18 @@ class QuantumCommunicator:
         """Apply quantum state logic based on motion detection"""
         if self.Do == 1:
             self.Do2 = 1
-            if self.qu == 1 or self.it == 0:
+            if self.qu == 1 and self.it == 0:
                 self.qu = 0
                 self.it += 1
-            if self.qu == 0 or self.it == 0:
+            if self.qu == 0 and self.it == 0:
                 self.qu = 1
                 self.it += 1
             self.it = 0
             
-        if b < 11 or 4 < bb:
+        if 4 < b < 11 or 4 < bb < 11:
             self.or_count += 1
             
-        if b < 11 and 4 < bb:
+        if 4 < b < 11 and 4 < bb < 11:
             self.and_count += 1
             if self.Do == 1:
                 self.toggle_quantum_state()
@@ -341,7 +341,7 @@ class QuantumCommunicator:
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
         # Using test_int as our target value
-        if self.PIN >= self.ghostprotocol * self.range :
+        if self.PIN == self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
             
 
