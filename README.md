@@ -1,3 +1,3 @@
 # Qubox
 
-timecode uses an LDR on analog 0
+to find the PIN, look for longest OR duration gaps, is the range between
