@@ -111,7 +111,7 @@ class QuantumCommunicator:
         
         print(f"\nPROTOCOL STATUS:")
         print(f"Ghost Protocol Value: {self.ghostprotocol * self.range}")
-        print(f"Ghost Protocol State: {self.ghostprotocol}")
+        print(f"Ghost Protocol State: {self.ghostprotocol * self.range}")
         print(f"Prime State: {self.prime}")
         print(f"Acknowledgments (ACK): {self.ack}")
         print(f"Nullifications (NUL): {self.nul}")
@@ -282,7 +282,7 @@ class QuantumCommunicator:
         check = self.numa.split(",")
         
         if self.and_count > self.corr and self.cyc < len(check):
-            if check[self.cyc] == str(self.qu):
+            if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
                     self.qu = np.random.randint(0, 2)
                     self.swi = 0
@@ -298,7 +298,7 @@ class QuantumCommunicator:
                     self.prime += 1
                 
         if self.or_count > self.corr and self.cyc < len(check):
-            if check[self.cyc] != str(self.qu):
+            if check[self.cyc] == str(self.qu):
                 if self.swi == self.longcyc:
                     self.qu = np.random.randint(0, 2)
                     self.swi = 0
@@ -331,18 +331,16 @@ class QuantumCommunicator:
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
                 
-                if (current_value * self.range) == (self.ghostprotocollast + self.range):
-                    self.ghost_messages.append("****** Milestone reached ******")
-
+               
     def update_output(self, message):
         """Update output display"""
         self.ghost_messages.append(message.strip())
         
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-        PIN = 2455 #Guess PIN
+        PIN = 12455 #Guess PIN
         # Using test_int as our target value
-        if PIN <= self.ghostprotocol * self.range :
+        if PIN >= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
             
 
