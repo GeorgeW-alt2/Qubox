@@ -232,10 +232,10 @@ class QuantumCommunicator:
         """Apply quantum state logic based on motion detection"""
         if self.Do == 1:
             self.Do2 = 1
-            if self.qu == 1 and self.it == 0:
+            if self.qu == 1 or self.it == 0:
                 self.qu = 0
                 self.it += 1
-            if self.qu == 0 and self.it == 0:
+            if self.qu == 0 or self.it == 0:
                 self.qu = 1
                 self.it += 1
             self.it = 0
