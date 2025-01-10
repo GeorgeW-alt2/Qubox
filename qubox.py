@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from collections import deque
 import random
+PIN = 10000
 class QuantumCommunicator:
     def __init__(self, sensitivity=500):
         # Camera and processing setup
@@ -28,7 +29,7 @@ class QuantumCommunicator:
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        self.PIN = random.randint(1000, 10000) #Guess PIN
+        self.PIN = random.randint(1000, PIN) #Guess PIN, i.e max range 10000
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -90,7 +91,7 @@ class QuantumCommunicator:
             
         self.clear_console()
         ack_stats = self.analyze_ack_rate()
-        if not (0.6 <= ack_stats['acks_per_second'] <= 1.2):
+        if not (0.5 <= ack_stats['acks_per_second'] <= 1.5):
             return
         print("=" * 50)
         print("QUANTUM COMMUNICATOR STATUS")
