@@ -1,3 +1,3 @@
 # Qubox
 
-to find the PIN, look for longest OR duration gaps, is the range between
+to find the PIN, is the range between longest OR duration gap or typically with a rapid drop in ACK's/refresh
