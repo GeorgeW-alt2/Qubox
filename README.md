@@ -1,3 +1,3 @@
 # Qubox
 
-to find the PIN, is the range between longest OR duration gap or typically with a rate drop in ACK's
+to find the PIN, typically with a reversable rate drop in ACK's
