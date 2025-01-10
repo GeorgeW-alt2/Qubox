@@ -1,3 +1,3 @@
 # Qubox
 
-to find the PIN, typically with a reversable rate drop in ACK's
+to find the PIN, typically between the last two OR durations
