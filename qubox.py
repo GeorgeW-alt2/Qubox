@@ -52,7 +52,7 @@ class QuantumCommunicator:
         
         # OR state tracking
         self.or_state_duration = 0
-        self.or_state_threshold = 5  # Number of consecutive seconds to trigger message
+        self.or_state_threshold = 3  # Number of consecutive seconds to trigger message
         self.last_or_state_time = None
 
     def analyze_ack_rate(self):
@@ -90,7 +90,8 @@ class QuantumCommunicator:
             
         self.clear_console()
         ack_stats = self.analyze_ack_rate()
-        
+        if not (0.6 <= ack_stats['acks_per_second'] <= 1.2):
+            return
         print("=" * 50)
         print("QUANTUM COMMUNICATOR STATUS")
         print("=" * 50)
@@ -316,7 +317,6 @@ class QuantumCommunicator:
 
     def process_ghost_protocol(self):
         """Process ghost protocol states"""
-        self.ghostprotocol += 1
         current_value = self.ghostprotocol * self.range
         
         if self.prime > 1 and self.ghostprotocol > 3:
@@ -336,12 +336,13 @@ class QuantumCommunicator:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
+        self.ghostprotocol += 1
 
         
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
         # Using test_int as our target value
-        if self.PIN == self.ghostprotocol * self.range :
+        if self.PIN <= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
             
 
