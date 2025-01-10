@@ -150,7 +150,7 @@ class QuantumCommunicator:
             f"Delta: {stats['ack_delta']}, "
             f"Elapsed: {stats['elapsed_time']}s, "
             f"Ghost Protocol: {self.ghostprotocol}, "
-            f"Ghost Value: {self.ghostprotocol * self.range},"
+            f"Ghost Value: {self.ghostprotocol * self.range}, "
             f"PIN: {self.PIN}"
         )
         
@@ -341,7 +341,7 @@ class QuantumCommunicator:
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
         # Using test_int as our target value
-        if PIN >= self.ghostprotocol * self.range :
+        if self.PIN >= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
             
 
