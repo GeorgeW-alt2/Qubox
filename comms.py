@@ -106,21 +106,12 @@ class QuantumCommunicator:
         """Log ACK statistics and ghost protocol messages to a file"""
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         log_entry = (
-            f"{current_time}, "
-            f"ACKs/Refresh: {stats['acks_per_refresh']}, "
-            f"ACKs/Second: {stats['acks_per_second']}, "
-            f"Total ACKs: {stats['total_acks']}, "
-            f"Delta: {stats['ack_delta']}, "
-            f"Elapsed: {stats['elapsed_time']}s, "
-            f"Ghost Protocol: {self.ghostprotocol}, "
-            f"Ghost Value: {self.ghostprotocol * self.range}, "
+self.binary
         )
         
-        if self.last_or_state_time:
-            or_duration = (datetime.now() - self.last_or_state_time).total_seconds()
-            log_entry += f", OR Duration: {or_duration:.2f}s"
+       
         
-        log_entry += "\n"
+        log_entry += "\n\n"
         
         with open("ack_stats.log", "a") as f:
             f.write(log_entry)
