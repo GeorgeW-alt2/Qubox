@@ -1,3 +1,4 @@
 # Qubox
 
-to find the PIN, typically between the last two OR durations
+find the solution, check for slight abnormalities in the chart for the solution.
+
