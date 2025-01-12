@@ -397,8 +397,8 @@ class QuantumCommunicator:
     
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-        # Using test_int as our target value
-        if self.PIN <= self.ghostprotocol * self.range :
+        problem = self.PIN/4 # enter any math problem to solve
+        if problem <= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
 
 if __name__ == "__main__":
