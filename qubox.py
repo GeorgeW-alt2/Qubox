@@ -6,8 +6,8 @@ from collections import deque
 import random
 import time
 
+PIN = 15000
 
-PIN = 10000
 class QuantumCommunicator:
     def __init__(self, sensitivity=500):
         # Camera and processing setup
@@ -35,7 +35,7 @@ class QuantumCommunicator:
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        self.PIN = random.randint(10000, PIN) #Guess PIN, i.e max range 10000
+        self.PIN = random.randint(1000, PIN) #Guess PIN, i.e max range 10000
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -61,6 +61,11 @@ class QuantumCommunicator:
         self.or_state_duration = 0
         self.or_state_threshold = 3  # Number of consecutive seconds to trigger message
         self.last_or_state_time = None
+        
+        # AND state tracking
+        self.and_state_duration = 0
+        self.and_state_threshold = 3  # Number of consecutive seconds to trigger message
+        self.last_and_state_time = None
 
     def analyze_ack_rate(self):
         """Calculate and return ACK rate statistics"""
@@ -121,6 +126,9 @@ class QuantumCommunicator:
         if self.last_or_state_time:
             or_duration = (current_time - self.last_or_state_time).total_seconds()
             print(f"Current OR State Duration: {or_duration:.2f}s")
+        if self.last_and_state_time:
+            and_duration = (current_time - self.last_and_state_time).total_seconds()
+            print(f"Current AND State Duration: {and_duration:.2f}s")
         motion_percentage = (self.motion_frame_count / max(1, self.total_frames)) * 100
         print(f"Motion Detected: {self.motion_frame_count} frames ({motion_percentage:.1f}%)")
         
@@ -164,6 +172,10 @@ class QuantumCommunicator:
         if self.last_or_state_time:
             or_duration = (datetime.now() - self.last_or_state_time).total_seconds()
             log_entry += f", OR Duration: {or_duration:.2f}s"
+        
+        if self.last_and_state_time:
+            and_duration = (datetime.now() - self.last_and_state_time).total_seconds()
+            log_entry += f", AND Duration: {and_duration:.2f}s"
         
         log_entry += "\n"
         
@@ -309,6 +321,12 @@ class QuantumCommunicator:
         
         # Process AND states
         if self.and_count > self.corr and self.cyc < len(check):
+            if self.last_and_state_time is None:
+                self.last_and_state_time = current_time
+                self.ghost_messages.append(f"AND state initiated at {current_time.strftime('%H:%M:%S')}")
+            
+            and_duration = (current_time - self.last_and_state_time).total_seconds()
+            
             if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
                     # Initialize the seed using the current time
@@ -326,6 +344,12 @@ class QuantumCommunicator:
                     self.prime = 0
                 else:
                     self.prime += 1
+                
+                if and_duration >= self.and_state_threshold:
+                    message = f"Prolonged AND state detected: Duration {and_duration:.2f}s, Value: {self.qu}"
+                    self.ghost_messages.append(message)
+            else:
+                self.last_and_state_time = None
 
     def process_ghost_protocol(self):
         """Process ghost protocol states"""
