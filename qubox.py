@@ -5,8 +5,8 @@ from datetime import datetime
 from collections import deque
 import random
 import time
-
-PIN = 15000
+import matplotlib.pyplot as plt
+PIN = 16000
 
 class QuantumCommunicator:
     def __init__(self, sensitivity):
@@ -15,6 +15,9 @@ class QuantumCommunicator:
         self.data2 = None
         self.capture = cv2.VideoCapture(0)
         
+        self.ack_data = []  # To store ACK/Refresh data
+        self.ack_second_data = []  # To store ACK/Second data
+        self.i = 0
         # Initialize quantum state variables
         self.Do = 1
         self.Do2 = 0
@@ -31,11 +34,11 @@ class QuantumCommunicator:
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
-        self.ghostprotocol = 0
+        self.ghostprotocol = 2000
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        self.PIN = random.randint(1000, PIN) #Guess PIN, i.e max range 10000
+        self.PIN = random.randint(5000, PIN) #Guess PIN, i.e max range 10000
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -66,7 +69,20 @@ class QuantumCommunicator:
         self.and_state_duration = 0
         self.and_state_threshold = 3  # Number of consecutive seconds to trigger message
         self.last_and_state_time = None
+    def plot_ack_data(self):
+        """Plot the ACK and ACK/Second data."""
+        plt.figure(figsize=(10, 6))
 
+        # Plot ACK data
+        plt.subplot(2, 1, 1)
+        plt.plot(self.ack_data, label="ACK/Refresh Data", color="blue")
+        plt.title("ACK/Refresh Data Over Time")
+        plt.xlabel("Frame Number")
+        plt.ylabel("Count")
+        plt.legend()
+        
+        plt.tight_layout()
+        plt.show()
     def analyze_ack_rate(self):
         """Calculate and return ACK rate statistics"""
         current_time = datetime.now()
@@ -158,6 +174,7 @@ class QuantumCommunicator:
         """Log ACK statistics and ghost protocol messages to a file"""
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         log_entry = (
+            f"Frame: {self.i}, "  # Add frame number
             f"{current_time}, "
             f"ACKs/Refresh: {stats['acks_per_refresh']}, "
             f"ACKs/Second: {stats['acks_per_second']}, "
@@ -168,7 +185,9 @@ class QuantumCommunicator:
             f"Ghost Value: {self.ghostprotocol * self.range}, "
             f"PIN: {self.PIN}"
         )
-        
+        self.i += 1
+        self.ack_data.append(stats['acks_per_refresh'])
+        self.ack_data.append(stats['acks_per_second'])
         if self.last_or_state_time:
             or_duration = (datetime.now() - self.last_or_state_time).total_seconds()
             log_entry += f", OR Duration: {or_duration:.2f}s"
@@ -292,7 +311,7 @@ class QuantumCommunicator:
             
             or_duration = (current_time - self.last_or_state_time).total_seconds()
             
-            if check[self.cyc] == str(self.qu):
+            if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
                     # Initialize the seed using the current time
                     seed = int(time.time())
@@ -327,7 +346,7 @@ class QuantumCommunicator:
             
             and_duration = (current_time - self.last_and_state_time).total_seconds()
             
-            if check[self.cyc] != str(self.qu):
+            if check[self.cyc] == str(self.qu):
                 if self.swi == self.longcyc:
                     # Initialize the seed using the current time
                     seed = int(time.time())
@@ -355,7 +374,7 @@ class QuantumCommunicator:
         """Process ghost protocol states"""
         current_value = self.ghostprotocol * self.range
         
-        if self.prime > 1 and self.ghostprotocol > 3:
+        if self.prime < 1 and self.ghostprotocol > 3:
             if self.GhostIterate == 0:
                 self.ghostprotocollast = current_value
                 self.GhostIterate += 1
@@ -372,9 +391,10 @@ class QuantumCommunicator:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
-        self.ghostprotocol += 1
-
-        
+        self.ghostprotocol -= 1
+        if self.ghostprotocol <= 0:
+            exit()
+    
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
         # Using test_int as our target value
@@ -403,4 +423,6 @@ if __name__ == "__main__":
         if hasattr(communicator, 'capture'):
             communicator.capture.release()
         cv2.destroyAllWindows()
+        communicator.plot_ack_data()
+
         print("Shutdown complete.")
