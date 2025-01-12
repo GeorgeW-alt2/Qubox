@@ -9,7 +9,7 @@ import time
 PIN = 15000
 
 class QuantumCommunicator:
-    def __init__(self, sensitivity=500):
+    def __init__(self, sensitivity):
         # Camera and processing setup
         self.sensitivity = sensitivity
         self.data2 = None
@@ -380,7 +380,6 @@ def send_message(self):
         # Using test_int as our target value
         if self.PIN <= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
-            
 
 if __name__ == "__main__":
     try:
@@ -389,7 +388,7 @@ if __name__ == "__main__":
             os.makedirs('logs')
             
         # Initialize the communicator
-        communicator = QuantumCommunicator(sensitivity=500)
+        communicator = QuantumCommunicator(sensitivity=1500)
         print("Quantum Communicator initialized. Starting camera feed...")
         
         # Start processing
