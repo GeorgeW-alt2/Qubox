@@ -4,6 +4,9 @@ import os
 from datetime import datetime
 from collections import deque
 import random
+import time
+
+
 PIN = 10000
 class QuantumCommunicator:
     def __init__(self, sensitivity=500):
@@ -13,7 +16,7 @@ class QuantumCommunicator:
         self.capture = cv2.VideoCapture(0)
         
         # Initialize quantum state variables
-        self.Do = 0
+        self.Do = 1
         self.Do2 = 0
         self.qu = 0
         self.it = 0
@@ -22,6 +25,9 @@ class QuantumCommunicator:
         self.cyc = 0
         self.swi = 0
         self.longcyc = 3
+        # Initialize the seed using the current time
+        seed = int(time.time())
+        random.seed(seed)
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
@@ -29,7 +35,7 @@ class QuantumCommunicator:
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        self.PIN = random.randint(1000, PIN) #Guess PIN, i.e max range 10000
+        self.PIN = random.randint(10000, PIN) #Guess PIN, i.e max range 10000
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -91,8 +97,7 @@ class QuantumCommunicator:
             
         self.clear_console()
         ack_stats = self.analyze_ack_rate()
-        if not (0.5 <= ack_stats['acks_per_second'] <= 1.5):
-            return
+
         print("=" * 50)
         print("QUANTUM COMMUNICATOR STATUS")
         print("=" * 50)
@@ -277,6 +282,9 @@ class QuantumCommunicator:
             
             if check[self.cyc] == str(self.qu):
                 if self.swi == self.longcyc:
+                    # Initialize the seed using the current time
+                    seed = int(time.time())
+                    random.seed(seed)
                     self.qu = np.random.randint(0, 2)
                     self.swi = 0
                 self.swi += 1
@@ -303,6 +311,9 @@ class QuantumCommunicator:
         if self.and_count > self.corr and self.cyc < len(check):
             if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
+                    # Initialize the seed using the current time
+                    seed = int(time.time())
+                    random.seed(seed)
                     self.qu = np.random.randint(0, 2)
                     self.swi = 0
                     self.prime = 0
