@@ -34,12 +34,11 @@ class QuantumCommunicator:
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
-        self.ghostprotocol = 2500
+        self.ghostprotocol = 3000
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        self.PIN = random.choice([True, False])
-
+        self.PIN = random.randint(5000, PIN) #Guess PIN, i.e max range 10000
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -398,8 +397,8 @@ class QuantumCommunicator:
     
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-        
-        if self.PIN == True :
+        problem = self.PIN # enter any math problem to solve
+        if problem <= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
 
 if __name__ == "__main__":
