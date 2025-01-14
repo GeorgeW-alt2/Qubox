@@ -34,7 +34,7 @@ class QuantumCommunicator:
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
-        self.ghostprotocol = 1000
+        self.ghostprotocol = 2500
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
