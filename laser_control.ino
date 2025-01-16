@@ -1,7 +1,7 @@
 const int ledPin = 10; 
 int ledState = LOW; 
 unsigned long previousMillis = 0; 
-const long interval = 50;  
+const long interval = 170;  
 void setup() {
   pinMode(ledPin, OUTPUT);
 }
